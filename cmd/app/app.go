@@ -30,6 +30,7 @@ func InitDB() *gorm.DB {
 		log.Fatal("failed to connect to SQLite database:", err)
 	}
 
+	// Create tables on db
 	db.AutoMigrate(
 		&entities.Buyer{},
 		&entities.Customer{},
