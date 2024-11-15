@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// Cargar variables de entorno
+	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
@@ -16,7 +16,7 @@ func main() {
 
 	app.InitDB()
 
-	// Crear y arrancar el servidor
+	// Create and start server
 	router := app.CreateRouter()
 
 	err = router.StartServer()

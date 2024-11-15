@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Router estructura que contiene el servidor HTTP y su puerto.
+// Router structure contains the HTTP server and its port.
 type Router struct {
 	server *http.Server
 	port   string
@@ -32,17 +32,17 @@ func InitDB() *gorm.DB {
 	return db
 }
 
-// CreateRouter inicializa el router y devuelve una instancia de Router.
+// CreateRouter initializes the router and returns a Router instance.
 func CreateRouter() *Router {
 	router := chi.NewRouter()
 
-	// Endpoint para prueba
+	// Endpoint for testing
 	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("pong"))
 	})
 
-	// Configuración del servidor HTTP
+	// HTTP server configuration
 	return &Router{
 		server: &http.Server{
 			Addr:    ":" + os.Getenv("SERVER_PORT"),
@@ -52,7 +52,7 @@ func CreateRouter() *Router {
 	}
 }
 
-// StartServer inicia el servidor HTTP.
+// StartServer starts the HTTP server.
 func (r *Router) StartServer() error {
 	if r.port == "" {
 		return errors.New("server port is not defined")
@@ -60,7 +60,7 @@ func (r *Router) StartServer() error {
 
 	log.Println("Server running on port " + r.port)
 
-	// Iniciar el servidor
+	// Start the server
 	err := r.server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		log.Println(ErrStartingServer.Error())
