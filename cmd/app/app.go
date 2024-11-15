@@ -65,6 +65,7 @@ func CreateRouter(db *gorm.DB) *gin.Engine {
 	{
 		apiV1.GET("/buyers", buyersHd.GetBuyers())
 		apiV1.POST("/buyers", buyersHd.CreateBuyer())
+		apiV1.PUT("/buyers/:id", buyersHd.UpdateBuyer())
 	}
 
 	return router

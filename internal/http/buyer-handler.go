@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,6 +55,47 @@ func (h *BuyerHandler) CreateBuyer() gin.HandlerFunc {
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"data": newBuyer,
+		})
+	}
+}
+
+// UpdateBuyer handles the HTTP PUT request to update a buyer
+func (h *BuyerHandler) UpdateBuyer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		IDParam := c.Param("id")
+		ID, err := strconv.Atoi(IDParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid buyer ID param",
+			})
+			return
+		}
+
+		var buyer entities.BuyerAttributes
+		if err := c.ShouldBindJSON(&buyer); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid JSON body",
+				"error":   err.Error(),
+			})
+			return
+		}
+
+		updatedBuyer, err := h.sv.UpdateBuyer(ID, buyer)
+		if err != nil {
+			if errors.Is(err, services.ErrBuyerNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{
+					"error": "buyer not found",
+				})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to update buyer",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data": updatedBuyer,
 		})
 	}
 }

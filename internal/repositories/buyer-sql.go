@@ -45,3 +45,34 @@ func (r *BuyerRepository) CreateBuyer(buyer entities.BuyerAttributes) (entities.
 
 	return newBuyer, nil
 }
+
+// UpdateBuyer updates a buyer in the database
+// Returns the updated buyer and an error, if any occurs during the query
+func (r *BuyerRepository) UpdateBuyer(ID int, buyer entities.BuyerAttributes) (entities.Buyer, error) {
+	updatedBuyer := entities.Buyer{
+		ID:              ID,
+		BuyerAttributes: buyer,
+	}
+
+	if err := r.db.Save(&updatedBuyer).Error; err != nil {
+		return entities.Buyer{}, err
+	}
+
+	return updatedBuyer, nil
+}
+
+// GetBuyerByID retrieves a buyer from the database by its ID
+// Returns the buyer and an error if the query fails or no buyer is found
+func (r *BuyerRepository) GetBuyerByID(ID int) (entities.Buyer, error) {
+	var buyer entities.Buyer
+
+	err := r.db.First(&buyer, ID).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return entities.Buyer{}, ErrBuyerNotFound
+		}
+		return entities.Buyer{}, err
+	}
+
+	return buyer, nil
+}
