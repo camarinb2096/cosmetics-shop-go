@@ -3,7 +3,6 @@ package services
 import (
 	"camarinb2096/cosmetics-shop-go/internal/entities"
 	"camarinb2096/cosmetics-shop-go/internal/repositories"
-	"errors"
 )
 
 // BuyerService represents a buyer service
@@ -26,7 +25,7 @@ func (s *BuyerService) GetBuyers() ([]entities.Buyer, error) {
 	}
 
 	if len(buyers) == 0 {
-		return buyers, errors.New("not buyers found")
+		return buyers, ErrBuyersNotFound
 	}
 
 	return buyers, nil
