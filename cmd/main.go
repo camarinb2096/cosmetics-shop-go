@@ -14,6 +14,8 @@ func main() {
 		log.Fatal("Error loading .env file:", err)
 	}
 
+	app.InitDB()
+
 	// Crear y arrancar el servidor
 	router := app.CreateRouter()
 

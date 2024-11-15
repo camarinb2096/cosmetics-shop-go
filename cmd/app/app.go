@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 // Router estructura que contiene el servidor HTTP y su puerto.
@@ -18,6 +20,17 @@ type Router struct {
 var (
 	ErrStartingServer = errors.New("error starting server")
 )
+
+// InitDB initializes a SQLite database connection using GORM.
+func InitDB() *gorm.DB {
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		log.Fatal("failed to connect to SQLite database:", err)
+	}
+
+	log.Println("database initialized in memory")
+	return db
+}
 
 // CreateRouter inicializa el router y devuelve una instancia de Router.
 func CreateRouter() *Router {
