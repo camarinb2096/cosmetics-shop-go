@@ -1,6 +1,7 @@
 package app
 
 import (
+	"camarinb2096/cosmetics-shop-go/internal/entities"
 	"errors"
 	"log"
 	"net/http"
@@ -23,10 +24,17 @@ var (
 
 // InitDB initializes a SQLite database connection using GORM.
 func InitDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"),
+		&gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect to SQLite database:", err)
 	}
+
+	db.AutoMigrate(
+		&entities.Buyer{},
+		&entities.Customer{},
+		&entities.Invoice{},
+		&entities.Product{})
 
 	log.Println("database initialized in memory")
 	return db
