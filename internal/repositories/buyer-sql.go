@@ -30,3 +30,18 @@ func (r *BuyerRepository) GetBuyers() ([]entities.Buyer, error) {
 	}
 	return buyers, nil
 }
+
+// CreateBuyer creates a new buyer on DB
+// Returns the object created and an error, if any occurs during the query
+func (r *BuyerRepository) CreateBuyer(buyer entities.BuyerAttributes) (entities.Buyer, error) {
+	newBuyer := entities.Buyer{
+		BuyerAttributes: buyer,
+	}
+
+	result := r.db.Create(&newBuyer)
+	if result.Error != nil {
+		return entities.Buyer{}, result.Error
+	}
+
+	return newBuyer, nil
+}

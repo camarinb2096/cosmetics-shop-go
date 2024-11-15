@@ -1,7 +1,9 @@
 package http
 
 import (
+	"camarinb2096/cosmetics-shop-go/internal/entities"
 	"camarinb2096/cosmetics-shop-go/internal/services"
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -33,5 +35,25 @@ func (h *BuyerHandler) GetBuyers() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"buyers": buyers})
+	}
+}
+
+// CreateBuyer handles the HTTP POST request to create a buyer
+func (h *BuyerHandler) CreateBuyer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var buyer entities.BuyerAttributes
+		err := json.NewDecoder(c.Request.Body).Decode(&buyer)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		newBuyer, err := h.sv.CreateBuyer(buyer)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"data": newBuyer,
+		})
 	}
 }

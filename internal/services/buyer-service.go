@@ -31,3 +31,12 @@ func (s *BuyerService) GetBuyers() ([]entities.Buyer, error) {
 	return buyers, nil
 
 }
+
+// CreateBuyer creates a new buyer
+func (s *BuyerService) CreateBuyer(buyer entities.BuyerAttributes) (entities.Buyer, error) {
+	newBuyer, err := s.rp.CreateBuyer(buyer)
+	if err != nil {
+		return entities.Buyer{}, err
+	}
+	return newBuyer, nil
+}
