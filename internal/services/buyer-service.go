@@ -55,3 +55,17 @@ func (s *BuyerService) UpdateBuyer(ID int, buyer entities.BuyerAttributes) (enti
 	}
 	return updatedBuyer, nil
 }
+
+// DeleteBuyer deletes a buyer by their ID
+func (s *BuyerService) DeleteBuyer(ID int) error {
+	_, err := s.rp.GetBuyerByID(ID)
+	if errors.Is(err, repositories.ErrBuyerNotFound) {
+		return ErrBuyerNotFound
+	}
+
+	err = s.rp.DeleteBuyer(ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

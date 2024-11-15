@@ -76,3 +76,15 @@ func (r *BuyerRepository) GetBuyerByID(ID int) (entities.Buyer, error) {
 
 	return buyer, nil
 }
+
+// DeleteBuyer deletes a buyer from the database by their ID
+// Returns an error if the query fails
+func (r *BuyerRepository) DeleteBuyer(ID int) error {
+	result := r.db.Delete(&entities.Buyer{}, ID)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

@@ -99,3 +99,33 @@ func (h *BuyerHandler) UpdateBuyer() gin.HandlerFunc {
 		})
 	}
 }
+
+// DeleteBuyer handles HTTP DELETE method for delete a buyer
+func (h *BuyerHandler) DeleteBuyer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		IDParam := c.Param("id")
+		ID, err := strconv.Atoi(IDParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid ID param",
+			})
+		}
+
+		err = h.sv.DeleteBuyer(ID)
+		if err != nil {
+			if errors.Is(err, services.ErrBuyerNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{
+					"message": err.Error(),
+				})
+				return
+			}
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "buyer deleted succesfully",
+		})
+	}
+}

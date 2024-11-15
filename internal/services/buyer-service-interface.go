@@ -17,4 +17,6 @@ type BuyerServiceInterface interface {
 	CreateBuyer(buyer entities.BuyerAttributes) (entities.Buyer, error)
 	// UpdateBuyer updates a buyer by their ID
 	UpdateBuyer(ID int, buyer entities.BuyerAttributes) (entities.Buyer, error)
+	// DeleteBuyer deletes a buyer by their ID
+	DeleteBuyer(ID int) error
 }

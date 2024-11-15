@@ -23,4 +23,7 @@ type BuyerRepositoryInterface interface {
 	// GetBuyerByID retrieves a buyer from the database by its ID
 	// Returns the buyer and an error if the query fails or no buyer is found
 	GetBuyerByID(ID int) (entities.Buyer, error)
+	// DeleteBuyer deletes a buyer from the database by their ID
+	// Returns an error if the query fails
+	DeleteBuyer(ID int) error
 }
