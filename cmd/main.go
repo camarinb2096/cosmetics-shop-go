@@ -11,17 +11,20 @@ func main() {
 	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
+		log.Fatal("error loading .env file:", err)
 	}
 
-	app.InitDB()
+	db, err := app.InitDB()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	// Create and start server
-	router := app.CreateRouter()
+	router := app.CreateRouter(db)
 
 	// Start the server
 	appRouter := &app.Router{}
 	if err := appRouter.StartServer(router, "8080"); err != nil {
-		log.Fatalf("Failed to start server: %s", err)
+		log.Fatalf("failed to start server: %s", err)
 	}
 }

@@ -2,9 +2,13 @@ package app
 
 import (
 	"camarinb2096/cosmetics-shop-go/internal/entities"
+	"camarinb2096/cosmetics-shop-go/internal/repositories"
+	"camarinb2096/cosmetics-shop-go/internal/services"
 	"errors"
 	"log"
 	"net/http"
+
+	handlers "camarinb2096/cosmetics-shop-go/internal/http"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
@@ -39,18 +43,28 @@ func InitDB() (*gorm.DB, error) {
 		return nil, errors.New("failed to auto-migrate database: " + err.Error())
 	}
 
-	log.Println("Database initialized in memory")
+	log.Println("database initialized in memory")
 	return db, nil
 }
 
 // CreateRouter initializes the Gin router and configures endpoints.
-func CreateRouter() *gin.Engine {
+func CreateRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
+
+	buyersRp := repositories.NewBuyerRepository(db)
+	buyersSv := services.NewBuyerService(buyersRp)
+	buyersHd := handlers.NewBuyerHandler(buyersSv)
 
 	// Health check endpoint
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
+
+	// Group API v1 routes
+	apiV1 := router.Group("/api/v1")
+	{
+		apiV1.GET("/buyers", buyersHd.GetBuyers())
+	}
 
 	return router
 }
@@ -67,9 +81,9 @@ func (r *Router) StartServer(router *gin.Engine, port string) error {
 		Handler: router,
 	}
 
-	log.Println("Server running on port " + port)
+	log.Println("server running on port " + port)
 	if err := r.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Println("Error starting server:", err)
+		log.Println("error starting server:", err)
 		return err
 	}
 
