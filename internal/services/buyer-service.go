@@ -33,6 +33,18 @@ func (s *BuyerService) GetBuyers() ([]entities.Buyer, error) {
 
 }
 
+// GetBuyerByID retrieves a buyer by ID
+func (s *BuyerService) GetBuyerByID(ID int) (entities.Buyer, error) {
+	buyer, err := s.rp.GetBuyerByID(ID)
+	if err != nil {
+		if errors.Is(err, repositories.ErrBuyerNotFound) {
+			return entities.Buyer{}, ErrBuyerNotFound
+		}
+		return entities.Buyer{}, err
+	}
+	return buyer, nil
+}
+
 // CreateBuyer creates a new buyer
 func (s *BuyerService) CreateBuyer(buyer entities.BuyerAttributes) (entities.Buyer, error) {
 	newBuyer, err := s.rp.CreateBuyer(buyer)

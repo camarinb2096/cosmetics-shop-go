@@ -13,6 +13,8 @@ var (
 type BuyerServiceInterface interface {
 	// GetBuyers retrieves a list of buyers
 	GetBuyers() ([]entities.Buyer, error)
+	// GetBuyerByID retrieves a buyer by ID
+	GetBuyerByID(ID int) (entities.Buyer, error)
 	// CreateBuyer creates a new buyer
 	CreateBuyer(buyer entities.BuyerAttributes) (entities.Buyer, error)
 	// UpdateBuyer updates a buyer by their ID

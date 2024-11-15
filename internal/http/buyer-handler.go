@@ -39,6 +39,36 @@ func (h *BuyerHandler) GetBuyers() gin.HandlerFunc {
 	}
 }
 
+// GetBuyerByID handles the HTTP GET request to find a buyer by ID
+func (h *BuyerHandler) GetBuyerByID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		IDParam := c.Param("id")
+		ID, err := strconv.Atoi(IDParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid ID param",
+			})
+			return
+		}
+		buyer, err := h.sv.GetBuyerByID(ID)
+		if err != nil {
+			if errors.Is(err, services.ErrBuyerNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{
+					"message": err.Error(),
+				})
+				return
+			}
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"data": buyer,
+		})
+	}
+}
+
 // CreateBuyer handles the HTTP POST request to create a buyer
 func (h *BuyerHandler) CreateBuyer() gin.HandlerFunc {
 	return func(c *gin.Context) {
