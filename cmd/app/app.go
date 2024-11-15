@@ -5,9 +5,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -23,57 +22,55 @@ var (
 )
 
 // InitDB initializes a SQLite database connection using GORM.
-func InitDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"),
-		&gorm.Config{})
+func InitDB() (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	if err != nil {
-		log.Fatal("failed to connect to SQLite database:", err)
+		return nil, errors.New("failed to connect to SQLite database: " + err.Error())
 	}
 
-	// Create tables on db
-	db.AutoMigrate(
+	// AutoMigrate creates tables for the specified entities.
+	err = db.AutoMigrate(
 		&entities.Buyer{},
 		&entities.Customer{},
 		&entities.Invoice{},
-		&entities.Product{})
+		&entities.Product{},
+	)
+	if err != nil {
+		return nil, errors.New("failed to auto-migrate database: " + err.Error())
+	}
 
-	log.Println("database initialized in memory")
-	return db
+	log.Println("Database initialized in memory")
+	return db, nil
 }
 
-// CreateRouter initializes the router and returns a Router instance.
-func CreateRouter() *Router {
-	router := chi.NewRouter()
+// CreateRouter initializes the Gin router and configures endpoints.
+func CreateRouter() *gin.Engine {
+	router := gin.Default()
 
-	// Endpoint for testing
-	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("pong"))
+	// Health check endpoint
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
-	// HTTP server configuration
-	return &Router{
-		server: &http.Server{
-			Addr:    ":" + os.Getenv("SERVER_PORT"),
-			Handler: router,
-		},
-		port: os.Getenv("SERVER_PORT"),
-	}
+	return router
 }
 
-// StartServer starts the HTTP server.
-func (r *Router) StartServer() error {
-	if r.port == "" {
+// StartServer starts the HTTP server using Gin.
+func (r *Router) StartServer(router *gin.Engine, port string) error {
+	if port == "" {
 		return errors.New("server port is not defined")
 	}
 
-	log.Println("Server running on port " + r.port)
+	r.port = port
+	r.server = &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
 
-	// Start the server
-	err := r.server.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
-		log.Println(ErrStartingServer.Error())
-		return ErrStartingServer
+	log.Println("Server running on port " + port)
+	if err := r.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Println("Error starting server:", err)
+		return err
 	}
 
 	return nil
