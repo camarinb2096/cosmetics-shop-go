@@ -55,19 +55,20 @@ func CreateRouter(db *gorm.DB) *gin.Engine {
 	buyersSv := services.NewBuyerService(buyersRp)
 	buyersHd := handlers.NewBuyerHandler(buyersSv)
 
-	// Health check endpoint
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
-	// Group API v1 routes
 	apiV1 := router.Group("/api/v1")
 	{
-		apiV1.GET("/buyers", buyersHd.GetBuyers())
-		apiV1.GET("/buyers/:id", buyersHd.GetBuyers())
-		apiV1.POST("/buyers", buyersHd.CreateBuyer())
-		apiV1.PUT("/buyers/:id", buyersHd.UpdateBuyer())
-		apiV1.DELETE("/buyers/:id", buyersHd.DeleteBuyer())
+		buyers := apiV1.Group("/buyers")
+		{
+			buyers.GET("", buyersHd.GetBuyers())          // /api/v1/buyers
+			buyers.GET("/:id", buyersHd.GetBuyerByID())   // /api/v1/buyers/:id
+			buyers.POST("", buyersHd.CreateBuyer())       // /api/v1/buyers
+			buyers.PUT("/:id", buyersHd.UpdateBuyer())    // /api/v1/buyers/:id
+			buyers.DELETE("/:id", buyersHd.DeleteBuyer()) // /api/v1/buyers/:id
+		}
 	}
 
 	return router
